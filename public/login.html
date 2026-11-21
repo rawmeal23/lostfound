@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login</title><!-- EDIT: browser tab title (site name is added automatically) -->
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="login">
+<div id="site-header"></div><!-- header is built by js/main.js (logo and name come from js/config.js) -->
+<div class="page-head"><div class="container"><h1>Login or Register</h1><p>Use your campus account.</p></div></div>
+<!-- EDIT: page title/subtitle above -->
+<section><div class="container" style="max-width:520px"><div class="panel">
+  <div class="tabs"><button class="tab active" data-tab="login">Login</button><button class="tab" data-tab="register">Register</button></div>
+  <div id="msg" class="msg"></div>
+  <form id="login-form" novalidate>
+    <div class="field"><label for="l-id">School ID or email</label><input id="l-id" required><span class="error"></span></div>
+    <div class="field" style="margin-top:12px"><label for="l-pass">Password</label><input type="password" id="l-pass" required><span class="error"></span></div>
+    <button class="btn" style="margin-top:16px">Login</button>
+  </form>
+  <form id="register-form" class="hidden" novalidate>
+    <div class="form-grid">
+      <div class="field full"><label for="r-name">Full name</label><input id="r-name" required><span class="error"></span></div>
+      <div class="field"><label for="r-id">School ID</label><input id="r-id" required><span class="error"></span></div>
+      <div class="field"><label for="r-role">I am a</label><select id="r-role" required><option>Student</option><option>Teacher</option><option>Staff</option></select><span class="error"></span></div>
+      <div class="field full"><label for="r-email">School email</label><input type="email" id="r-email" required><span class="error"></span></div>
+      <div class="field"><label for="r-pass">Password</label><input type="password" id="r-pass" required><span class="error"></span></div>
+      <div class="field"><label for="r-pass2">Confirm password</label><input type="password" id="r-pass2" required><span class="error"></span></div>
+      <div class="field full"><button class="btn">Create account</button></div>
+    </div>
+  </form>
+</div></div></section>
+<div id="site-footer"></div><!-- footer is built by js/main.js (text comes from js/config.js) -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

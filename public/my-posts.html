@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Posts</title><!-- EDIT: browser tab title (site name is added automatically) -->
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="myposts">
+<div id="site-header"></div><!-- header is built by js/main.js (logo and name come from js/config.js) -->
+<div class="page-head"><div class="container"><h1>My Posts and Claims</h1><p>Track what you posted and the claims you submitted.</p></div></div>
+<!-- EDIT: page title/subtitle above. TODO (PHP): show only the logged-in user's data -->
+<section><div class="container">
+  <div class="tabs"><button class="tab active" data-tab="posts">My Posts</button><button class="tab" data-tab="claims">My Claims</button></div>
+  <div id="tab-posts"><div class="grid" id="my-posts"></div></div>
+  <div id="tab-claims" class="hidden scroll"><table><thead><tr><th>Item</th><th>Date</th><th>Status</th></tr></thead><tbody id="my-claims"></tbody></table></div>
+</div></section>
+<div id="site-footer"></div><!-- footer is built by js/main.js (text comes from js/config.js) -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

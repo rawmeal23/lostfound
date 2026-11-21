@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home</title><!-- EDIT: browser tab title (site name is added automatically) -->
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="home">
+<div id="site-header"></div><!-- header is built by js/main.js (logo and name come from js/config.js) -->
+
+<!-- HERO: title, text, search hint and background image are set in js/config.js (SITE.hero) -->
+<div class="hero" id="hero"><div class="container">
+  <h1 id="hero-title"></h1><p id="hero-text"></p>
+  <div class="hero-actions">
+    <a class="btn alt" href="report.html?type=lost">I lost something</a><!-- EDIT: button text -->
+    <a class="btn ghost" style="color:#fff;border-color:#fff" href="report.html?type=found">I found something</a><!-- EDIT: button text -->
+  </div>
+  <form class="searchbar" id="hero-form"><input id="hero-q" type="search" aria-label="Search items"><button class="btn">Search</button></form>
+</div></div>
+
+<section><div class="container">
+  <div class="section-title"><h2>How it works</h2><!-- EDIT: section title --><p>Four simple steps to get your item back.</p><!-- EDIT --></div>
+  <div class="steps" id="steps"></div><!-- steps come from js/config.js (SITE.steps) -->
+</div></section>
+
+<section style="padding-top:0"><div class="container">
+  <div class="section-title"><h2>Browse by category</h2><!-- EDIT --></div>
+  <div class="cats" id="cats"></div><!-- categories come from js/config.js -->
+</div></section>
+
+<section style="padding-top:0"><div class="container">
+  <div class="section-title"><h2>Recently posted</h2><!-- EDIT --><p><a href="browse.html">See all items</a></p></div>
+  <div class="grid" id="recent"></div>
+</div></section>
+<div id="site-footer"></div><!-- footer is built by js/main.js (text comes from js/config.js) -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

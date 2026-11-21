@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report Item</title><!-- EDIT: browser tab title (site name is added automatically) -->
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="report">
+<div id="site-header"></div><!-- header is built by js/main.js (logo and name come from js/config.js) -->
+
+<div class="page-head"><div class="container"><h1 id="form-title"></h1><p id="form-sub"></p></div></div>
+<!-- Page used for BOTH: report.html?type=lost  and  report.html?type=found.  Titles are set in js/main.js (search "EDIT: page title") -->
+<section><div class="container"><div class="panel">
+  <div id="msg" class="msg"></div>
+  <form id="report-form" novalidate><div class="form-grid">
+    <div class="field full"><label for="title">Item name</label><input id="title" required placeholder="e.g. Black wallet"><span class="error"></span></div><!-- EDIT: labels and placeholders -->
+    <div class="field"><label for="cat">Category</label><select id="cat" required></select><span class="error"></span></div>
+    <div class="field"><label for="loc" id="where-label"></label><select id="loc" required></select><span class="error"></span></div>
+    <div class="field"><label for="date" id="date-label"></label><input type="date" id="date" required><span class="error"></span></div>
+    <div class="field"><label for="extra" id="extra-label"></label><input id="extra" required><span class="error"></span></div>
+    <div class="field full"><label for="desc">Description</label><textarea id="desc" rows="4" required placeholder="Color, brand, marks, what is inside..."></textarea><span class="error"></span></div>
+    <div class="field full"><label for="photo">Photo (JPG or PNG, max 3 MB)</label><input type="file" id="photo" accept="image/png,image/jpeg"><img id="preview" class="preview" alt="Photo preview"></div>
+    <div class="field full"><button class="btn">Submit</button></div>
+  </div></form>
+</div></div></section>
+<div id="site-footer"></div><!-- footer is built by js/main.js (text comes from js/config.js) -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
