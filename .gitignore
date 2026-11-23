@@ -1,0 +1,9 @@
+# User-uploaded photos (keep the folder, not the files)
+uploads/*
+!uploads/gitkeep
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

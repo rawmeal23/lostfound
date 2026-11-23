@@ -1,0 +1,46 @@
+/* ============================================================
+   POLISH STYLES (front end)
+   Header spacing, centered empty messages, card photo area,
+   admin table spacing and outlined buttons, access-denied box.
+   ============================================================ */
+
+/* ---- Header: spacing between menu, username and Log out ---- */
+.nav{gap:6px}
+.nav-user{color:#fff;font-weight:600;margin:0 16px 0 12px;opacity:.9}
+.nav form{margin:0}
+.btn-logout{
+  border:0;cursor:pointer;padding:8px 14px;border-radius:6px;
+  font:inherit;font-weight:600;font-size:.95rem;
+  background:var(--accent);color:#2b2200;
+}
+.btn-logout:hover{filter:brightness(.95)}
+
+/* ---- Empty messages sit in the center of the whole grid ---- */
+.grid > .empty{grid-column:1 / -1;text-align:center}
+
+/* ---- Item cards: same layout with or without a photo ---- */
+.item-photo-placeholder{width:100%;height:160px;background:#e3e8f1}
+
+/* ---- Admin tables: more room, clearer buttons ---- */
+.admin-table{min-width:900px}
+.admin-table th,.admin-table td{padding:14px 16px;vertical-align:top}
+.admin-table td img{display:block;margin-bottom:8px;border-radius:6px}
+.admin-table td strong,.admin-table td .meta{display:block}
+.admin-table td .badge{margin:6px 0}
+.admin-table td > div + div{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.admin-table details{margin:6px 0}
+.admin-table form{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 0}
+
+/* White buttons with a colored border and label:
+   blue = approve / confirm, red = reject */
+.admin-table .btn.small{
+  background:#fff;color:var(--primary);border:2px solid var(--primary);
+  padding:6px 14px;font-weight:600;
+}
+.admin-table .btn.small:hover{background:var(--primary);color:#fff}
+.admin-table .btn.small.danger{color:var(--lost);border-color:var(--lost)}
+.admin-table .btn.small.danger:hover{background:var(--lost);color:#fff}
+
+/* ---- "Admin access only" page ---- */
+.notice-card{max-width:560px;margin:0 auto;text-align:center}
+.notice-card p{color:var(--muted);margin:0 0 20px}

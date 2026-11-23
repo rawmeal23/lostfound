@@ -1,0 +1,33 @@
+/* ============================================================
+   LOGIN PAGE STYLES
+   Full-width campus photo behind the login form.
+   EDIT HERE: change the image path, or the overlay darkness
+   (the two rgba(...) numbers) to make the photo lighter/darker.
+   ============================================================ */
+
+.login-page{
+  min-height:70vh;
+  background:
+    linear-gradient(rgba(11,33,66,.55), rgba(11,33,66,.72)),  /* dark blue overlay */
+    url('../images/hero.jpg') center/cover no-repeat;         /* EDIT IMAGE */
+}
+
+/* Title sits directly on the photo instead of a solid blue bar */
+.login-page .page-head{
+  background:transparent;
+  text-align:center;
+  padding:56px 0 8px;
+}
+.login-page .page-head h1{text-shadow:0 2px 10px rgba(0,0,0,.45)}
+.login-page .page-head p{opacity:1;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+
+.login-page section{padding:24px 0 72px}
+
+/* White card so the form stays readable over the photo */
+.login-page .panel{
+  background:#fff;
+  box-shadow:0 14px 36px rgba(0,0,0,.35);
+}
+
+/* Remove the light gap between this page and the footer */
+.login-page + .site-footer{margin-top:0}

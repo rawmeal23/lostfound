@@ -1,0 +1,8 @@
+# Changelog (one line per change, newest on top)
+Format: YYYY-MM-DD | who | what changed | files
+2026-11-23 | Claude | Added campus photo login background, removed unused static pages/JS/test files, fixed home hero path and --card color, compressed images (png to jpg), added .gitignore | public/login.php, public/index.php, public/assets/css/login.css, public/assets/css/style.css, sql/seed.sql, README.md, .gitignore, docs/CHANGELOG.md
+2026-11-22 | Copilot | Added a CSRF-protected logout control to the shared navigation | templates/header.php, public/logout.php, docs/CHANGELOG.md
+2026-11-22 | Copilot | Made the home page's Recently posted section SQL-backed and seeded demo student/admin accounts with five claimable initial items | public/index.html, public/index.php, src/items_public.php, sql/seed.sql, docs/BLUEPRINT.md, docs/CHANGELOG.md
+2026-11-22 | Copilot | Connected report and claim forms to SQL, added dynamic browse/detail pages and dated item history with three-month outcome archiving | sql/schema.sql, sql/seed.sql, sql/upgrade_item_logs.sql, src/items_member.php, src/items_public.php, src/items_admin.php, src/claims.php, src/uploads.php, public/report.php, public/browse.php, public/item.php, public/admin.php, public/report.html, public/browse.html, public/item.html, public/assets/js/main.js, docs/BLUEPRINT.md, docs/CHANGELOG.md
+2026-11-22 | Copilot | Added protected database-backed admin item/claim table, separate report dates, and login navigation | sql/schema.sql, config/config.php, config/db.php, src/helpers.php, src/auth.php, src/items_admin.php, src/claims.php, templates/header.php, templates/footer.php, public/admin.php, public/login.php, public/admin.html, public/assets/js/main.js, docs/BLUEPRINT.md, docs/CHANGELOG.md
+
