@@ -35,6 +35,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $items = items_admin_all();
+
+// Items that need the admin's attention are listed first.
+$needs_action = static function (array $item): bool {
+    if (in_array($item['status'], ['pending', 'claimed'], true) || (bool) $item['outcome_eligible']) {
+        return true;
+    }
+    foreach ($item['claims'] as $claim) {
+        if ($claim['status'] === 'pending') {
+            return true;
+        }
+    }
+    return false;
+};
+// PHP's sort keeps the old order inside each group (newest first).
+usort($items, static fn (array $a, array $b): int => (int) $needs_action($b) <=> (int) $needs_action($a));
+$action_count = count(array_filter($items, $needs_action));
 $logs = item_logs_all();
 $message = flash_get();
 $page_title = 'Admin Dashboard | LSPU Lost and Found';
@@ -47,6 +63,7 @@ $format_date = static function (?string $value): string {
 
 require __DIR__ . '/../templates/header.php';
 ?>
+<link rel="stylesheet" href="assets/css/admin.css">
 <main>
   <div class="page-head"><div class="container"><h1>Item and Claim Management</h1><p>Review reports, claims, and returned-item status.</p></div></div>
   <section><div class="container">
@@ -54,6 +71,9 @@ require __DIR__ . '/../templates/header.php';
       <p class="msg show" role="<?= ($message['type'] ?? '') === 'error' ? 'alert' : 'status' ?>" style="<?= ($message['type'] ?? '') === 'error' ? 'background:#fde8e7;border-color:#e1aaa5;color:#8a1f17' : '' ?>"><?= e((string) $message['message']) ?></p>
     <?php endif; ?>
     <!-- CHANGE: Show each report once, with its matching date column and every claimant. -->
+    <?php if ($action_count > 0): ?>
+      <p class="action-summary"><?= $action_count ?> item(s) need your action. They are listed first.</p>
+    <?php endif; ?>
     <div class="scroll">
       <table class="admin-table">
         <thead>
@@ -72,7 +92,7 @@ require __DIR__ . '/../templates/header.php';
             <tr><td colspan="7">No item reports have been submitted.</td></tr>
           <?php endif; ?>
           <?php foreach ($items as $item): ?>
-            <tr>
+            <tr class="<?= $needs_action($item) ? 'needs-action' : '' ?>">
               <td><?= (int) $item['id'] ?></td>
               <td>
                 <?php if (!empty($item['photo_path'])): ?>
@@ -80,6 +100,7 @@ require __DIR__ . '/../templates/header.php';
                 <?php endif; ?>
                 <strong><?= e((string) $item['title']) ?></strong>
                 <span class="meta"><?= e((string) $item['type']) ?></span>
+                <?php if ($needs_action($item)): ?><span class="action-flag">Needs action</span><?php endif; ?>
               </td>
               <td><?= e($format_date($item['date_lost'] === null ? null : (string) $item['date_lost'])) ?></td>
               <td><?= e($format_date($item['date_found'] === null ? null : (string) $item['date_found'])) ?></td>

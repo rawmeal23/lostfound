@@ -476,6 +476,7 @@ Conventions: functions never echo and never redirect. They return plain arrays. 
 | items_admin.php | `item_set_status(int $id, string $status, int $admin_id): array` | allows pending -> approved/rejected and claimed -> returned |
 | items_admin.php | `item_record_outcome(int $id, int $admin_id, string $outcome): array` | after 3 months from date_lost, records found/never_found and archives the report |
 | items_admin.php | `dashboard_counts(): array` | counts per status and type |
+| items_admin.php | `admin_action_count(): int` | number of items that need admin action (pending reports, pending claims, claimed items waiting to be returned, lost reports ready for the three-month outcome); each item counted once, same rule as the note on admin.php |
 
 `items_search` filters (all optional): `q`, `type`, `category_id`, `location_id`, `date_from`, `date_to`.
 

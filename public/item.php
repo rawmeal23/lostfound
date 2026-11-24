@@ -78,7 +78,10 @@ require __DIR__ . '/../templates/header.php';
                 <?php foreach ($errors as $error): ?><p><?= e((string) $error) ?></p><?php endforeach; ?>
               </div>
             <?php endif; ?>
-            <?php if ($user === null): ?>
+            <?php if ($item['type'] === 'lost'): ?>
+              <p>This item was reported lost. If you found it, post it as a found item or bring it to the Lost and Found office.</p>
+              <p><a class="btn" href="report.php?type=found">Post a found item</a></p>
+            <?php elseif ($user === null): ?>
               <p><a href="login.php">Log in</a> to submit a claim.</p>
             <?php elseif ((int) $user['id'] === (int) $item['user_id']): ?>
               <p class="meta">You cannot claim your own report.</p>

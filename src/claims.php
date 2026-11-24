@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/notifications.php';
 
 // CHANGE: Save claims and review them transactionally with dated item history.
 function claim_create(int $item_id, int $claimant_id, string $proof): array
@@ -16,7 +17,7 @@ function claim_create(int $item_id, int $claimant_id, string $proof): array
 
     try {
         $item_statement = $connection->prepare(
-            'SELECT user_id, status FROM items WHERE id = :id FOR UPDATE'
+            'SELECT user_id, status, type FROM items WHERE id = :id FOR UPDATE'
         );
         $item_statement->execute(['id' => $item_id]);
         $item = $item_statement->fetch();
@@ -24,6 +25,11 @@ function claim_create(int $item_id, int $claimant_id, string $proof): array
         if (!$item || $item['status'] !== 'approved') {
             $connection->rollBack();
             return ['ok' => false, 'errors' => ['This item is not available to claim.'], 'id' => 0];
+        }
+        // A lost report belongs to the person who lost it, so it cannot be claimed.
+        if ($item['type'] !== 'found') {
+            $connection->rollBack();
+            return ['ok' => false, 'errors' => ['Only found items can be claimed. If you found this item, post it as a found item or bring it to the Lost and Found office.'], 'id' => 0];
         }
         if ((int) $item['user_id'] === $claimant_id) {
             $connection->rollBack();
@@ -103,7 +109,7 @@ function claim_review(int $claim_id, int $admin_id, string $decision): array
 
     try {
         $claim_statement = $connection->prepare(
-            'SELECT item_id, status, created_at FROM claims WHERE id = :id FOR UPDATE'
+            'SELECT item_id, claimant_id, status, created_at FROM claims WHERE id = :id FOR UPDATE'
         );
         $claim_statement->execute(['id' => $claim_id]);
         $claim = $claim_statement->fetch();
@@ -114,7 +120,7 @@ function claim_review(int $claim_id, int $admin_id, string $decision): array
         }
 
         $item_statement = $connection->prepare(
-            'SELECT status FROM items WHERE id = :id FOR UPDATE'
+            'SELECT status, title FROM items WHERE id = :id FOR UPDATE'
         );
         $item_statement->execute(['id' => (int) $claim['item_id']]);
         $item = $item_statement->fetch();
@@ -163,6 +169,15 @@ function claim_review(int $claim_id, int $admin_id, string $decision): array
             'details' => 'Claim ' . $decision,
         ]);
 
+        // Tell the claimant what happened to their claim.
+        notification_add(
+            $connection,
+            (int) $claim['claimant_id'],
+            $decision === 'approved'
+                ? 'Your claim for "' . $item['title'] . '" was approved. Visit the Lost and Found office with your school ID to collect it.'
+                : 'Your claim for "' . $item['title'] . '" was not approved.'
+        );
+
         $connection->commit();
         return ['ok' => true, 'errors' => []];
     } finally {
@@ -170,4 +185,22 @@ function claim_review(int $claim_id, int $admin_id, string $decision): array
             $connection->rollBack();
         }
     }
+}
+
+/*
+ * All claims made by one user, newest first, with the item title and status.
+ */
+function claims_by_user(int $user_id): array
+{
+    $statement = db()->prepare(
+        'SELECT cl.id, cl.status AS claim_status, cl.created_at, cl.reviewed_at,
+                i.id AS item_id, i.title, i.type, i.status AS item_status
+         FROM claims cl
+         JOIN items i ON i.id = cl.item_id
+         WHERE cl.claimant_id = :user_id
+         ORDER BY cl.created_at DESC, cl.id DESC'
+    );
+    $statement->execute(['user_id' => $user_id]);
+
+    return $statement->fetchAll();
 }

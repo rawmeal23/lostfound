@@ -1,0 +1,9 @@
+/* Styles for the Register, My Posts and My Claims pages. */
+.data-table{min-width:720px}
+.data-table th,.data-table td{padding:14px 16px;vertical-align:top}
+.data-table .meta{display:block;margin-top:6px}
+.data-table .badge{margin:0}
+.badge.archived{background:#777}
+.page-head + section .msg{margin-bottom:20px}
+/* Rows of buttons keep a 12px gap and wrap onto a new line on narrow screens. */
+.button-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}

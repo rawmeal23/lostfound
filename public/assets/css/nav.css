@@ -1,0 +1,78 @@
+/* ============================================================
+   NAVIGATION BAR, SIDE MENU AND NOTIFICATIONS
+   Loaded after polish.css, so these rules win.
+   EDIT: the number 1200px (twice, in the two @media lines and in
+   assets/js/nav.js) is the screen width where the bar turns into the
+   side menu. Use a very large number to always show the side menu.
+   ============================================================ */
+
+/* ---- Wide screens: one full-width bar ---- */
+.site-header .container{max-width:none;padding:0 32px}
+.brand{white-space:nowrap}
+.nav{flex:1;justify-content:flex-start;gap:4px;margin-left:28px}
+.nav a,.nav .btn-logout,.nav-user{white-space:nowrap}
+.nav-user{margin-left:auto}                    /* username + Log out on the right */
+.nav a[href="register.php"]{margin-left:auto}  /* Register + Login on the right (logged out) */
+
+/* The page you are on: a darker button with a gold underline */
+.nav a.is-current{background:rgba(0,0,0,.32);box-shadow:inset 0 -3px 0 var(--accent)}
+.nav a.is-current:hover{background:rgba(0,0,0,.42)}
+
+/* Buttons that only exist in the side menu */
+.nav-close,.nav-backdrop{display:none}
+
+/* Red circle with the number of unread notifications */
+.nav-count{
+  display:inline-block;min-width:20px;height:20px;line-height:20px;
+  padding:0 6px;margin-left:6px;border-radius:99px;
+  background:#e0382c;color:#fff;font-size:.75rem;font-weight:700;text-align:center;
+}
+
+/* ---- Smaller screens: the menu slides in from the right ---- */
+@media(max-width:1200px){
+  .menu-toggle{display:block;position:relative}
+  /* Red dot on the menu button when something is new */
+  .menu-dot{
+    position:absolute;top:4px;right:2px;width:12px;height:12px;border-radius:50%;
+    background:#e0382c;border:2px solid var(--primary);
+  }
+
+  .nav{
+    position:fixed;top:0;right:0;bottom:0;left:auto;
+    width:min(320px,85vw);margin:0;padding:64px 16px 24px;
+    display:flex;flex-direction:column;align-items:stretch;gap:2px;
+    background:var(--primary-dark);box-shadow:-10px 0 30px rgba(0,0,0,.4);
+    overflow-y:auto;z-index:60;
+    transform:translateX(100%);visibility:hidden;
+    transition:transform .25s ease,visibility .25s;
+  }
+  .nav.open{transform:none;visibility:visible}
+  .nav a{padding:12px 14px;font-size:1.05rem}
+  /* In the side menu the current section gets a gold bar on its left instead */
+  .nav a.is-current{box-shadow:inset 4px 0 0 var(--accent)}
+  .nav-user,.nav a[href="register.php"]{margin-left:0}
+  .nav-user{margin:14px 14px 6px}
+  .nav .btn-logout,.nav a.btn-nav{width:100%;text-align:center;padding:12px 14px}
+
+  .nav-close{
+    display:block;position:absolute;top:10px;right:14px;
+    background:none;border:0;color:#fff;font-size:2rem;line-height:1;cursor:pointer;
+  }
+  .nav-backdrop{
+    display:block;position:fixed;inset:0;z-index:50;
+    background:rgba(0,0,0,.45);opacity:0;pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  body.nav-open .nav-backdrop{opacity:1;pointer-events:auto}
+  body.nav-open{overflow:hidden}
+}
+
+/* ---- Notifications page ---- */
+.notice-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.notice-list li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.notice-list li.is-new{border-left:6px solid var(--accent)}
+.notice-list p{margin:0 0 6px}
+.new-tag{
+  display:inline-block;background:#e0382c;color:#fff;border-radius:99px;
+  padding:1px 10px;font-size:.75rem;font-weight:700;margin-bottom:6px;
+}

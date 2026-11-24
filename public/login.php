@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (is_string($identifier) && is_string($password) && login_user(trim($identifier), $password)) {
         $user = current_user();
-        redirect($user !== null && $user['role'] === 'admin' ? 'admin.php' : 'browse.php');
+        redirect($user !== null && $user['role'] === 'admin' ? 'admin.php' : 'index.php');
     }
 
     $error_message = 'The school ID/email or password was not recognized.';
@@ -43,6 +43,7 @@ require __DIR__ . '/../templates/header.php';
         </div>
         <button class="btn" style="margin-top:16px">Login</button>
       </form>
+      <p class="meta" style="margin:16px 0 0;text-align:center">No account yet? <a href="register.php">Register here</a>.</p>
     </div>
   </div></section>
 </main>

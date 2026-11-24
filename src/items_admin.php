@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/notifications.php';
 
 // CHANGE: Load live reports, claimant details, and persistent item history.
 function items_admin_all(): array
@@ -84,7 +85,7 @@ function item_set_status(int $id, string $status, int $admin_id): array
     $connection->beginTransaction();
 
     try {
-        $check = $connection->prepare('SELECT status FROM items WHERE id = :id FOR UPDATE');
+        $check = $connection->prepare('SELECT status, user_id, title FROM items WHERE id = :id FOR UPDATE');
         $check->execute(['id' => $id]);
         $item = $check->fetch();
 
@@ -122,6 +123,15 @@ function item_set_status(int $id, string $status, int $admin_id): array
             'event_type' => $event_type,
             'details' => 'Item status changed to ' . $status,
         ]);
+
+        // Tell the person who posted the report what happened to it.
+        $notice = match ($status) {
+            'approved' => 'Your report "' . $item['title'] . '" was approved and is now visible on the Browse page.',
+            'rejected' => 'Your report "' . $item['title'] . '" was rejected by the admin.',
+            'returned' => 'The item "' . $item['title'] . '" was marked as returned.',
+        };
+        notification_add($connection, (int) $item['user_id'], $notice);
+
         $connection->commit();
 
         return ['ok' => true, 'errors' => []];
@@ -189,4 +199,28 @@ function item_record_outcome(int $id, int $admin_id, string $outcome): array
             $connection->rollBack();
         }
     }
+}
+
+/*
+ * How many items need the admin's attention right now (shown as a red number
+ * on the Admin link). It uses the same rule as the "need your action" note
+ * on admin.php, and counts each item once even if it matches several rules:
+ *   - a report waiting for review (pending)
+ *   - an item that has a pending claim
+ *   - an item with an approved claim, waiting to be marked returned (claimed)
+ *   - a lost report three months old that still needs its outcome
+ */
+function admin_action_count(): int
+{
+    $statement = db()->prepare(
+        "SELECT COUNT(*)
+         FROM items i
+         WHERE i.status IN ('pending', 'claimed')
+            OR (i.type = 'lost' AND i.status = 'approved'
+                AND i.date_lost <= DATE_SUB(CURDATE(), INTERVAL 3 MONTH))
+            OR EXISTS (SELECT 1 FROM claims c WHERE c.item_id = i.id AND c.status = 'pending')"
+    );
+    $statement->execute();
+
+    return (int) $statement->fetchColumn();
 }

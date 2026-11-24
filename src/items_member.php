@@ -135,3 +135,22 @@ function item_create(int $user_id, array $data): array
         }
     }
 }
+
+/*
+ * All reports submitted by one user, newest first (any status).
+ */
+function items_by_user(int $user_id): array
+{
+    $statement = db()->prepare(
+        'SELECT i.id, i.type, i.title, i.status, i.date_lost, i.date_found,
+                i.created_at, c.name AS category, l.name AS location
+         FROM items i
+         JOIN categories c ON c.id = i.category_id
+         JOIN locations l ON l.id = i.location_id
+         WHERE i.user_id = :user_id
+         ORDER BY i.created_at DESC, i.id DESC'
+    );
+    $statement->execute(['user_id' => $user_id]);
+
+    return $statement->fetchAll();
+}
