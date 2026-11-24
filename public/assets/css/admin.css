@@ -1,10 +1,28 @@
-/* Admin page: highlight the items that need the admin's attention. */
+/* Admin page: highlight the items that need the admin's attention, and the filter tabs. */
 .action-summary{
-  background:#fff7dc;border:1px solid #f0d27a;border-left:6px solid var(--accent);
+  background:#e8f0fd;border:1px solid #b7cdf2;border-left:6px solid var(--accent-dark);
   border-radius:8px;padding:12px 16px;margin:0 0 18px;font-weight:600;
 }
-.admin-table tr.needs-action{background:#fffaf0;box-shadow:inset 6px 0 0 var(--accent)}
+.admin-table tr.needs-action{background:#f1f6fe;box-shadow:inset 6px 0 0 var(--accent-dark)}
 .action-flag{
-  display:inline-block;background:var(--accent);color:#2b2200;
+  display:inline-block;background:var(--accent);color:var(--on-accent);
   font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:99px;margin-top:6px;
 }
+
+/* Filter tabs above the item list */
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.filter-types{margin-bottom:18px}
+.filter-tab{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:99px;
+  padding:7px 14px;font-weight:600;font-size:.92rem;text-decoration:none;
+}
+.filter-tab:hover{border-color:var(--accent-dark);background:#eef4fe}
+.filter-tab.small{padding:4px 12px;font-size:.85rem}
+.filter-tab.is-selected{background:var(--primary);border-color:var(--primary);color:#fff}
+.filter-tab .count{
+  background:#e4edfb;color:var(--primary-dark);border-radius:99px;
+  padding:0 8px;font-size:.8rem;min-width:22px;text-align:center;
+}
+.filter-tab.has-action .count{background:#e0382c;color:#fff}
+.filter-tab.is-selected .count{background:var(--accent);color:var(--on-accent)}

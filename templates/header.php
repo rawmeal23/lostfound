@@ -22,6 +22,7 @@ $nav_sections = [
     'my_claims.php' => 'claims',
     'notifications.php' => 'notifications',
     'admin.php' => 'admin',
+    'change_password.php' => 'password',
     'register.php' => 'register',
 ];
 $nav_current = $nav_sections[basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''))] ?? '';
@@ -37,9 +38,10 @@ $nav_attr = static fn (string $section): string => $section === $nav_current ? '
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/polish.css">
   <link rel="stylesheet" href="assets/css/nav.css">
+  <link rel="stylesheet" href="assets/css/theme.css">
   <script src="assets/js/nav.js" defer></script>
 </head>
-<body>
+<body<?= isset($body_class) ? ' class="' . e((string) $body_class) . '"' : '' ?>>
 <!-- CHANGE: Use shared navigation for the protected PHP pages. -->
 <header class="site-header">
   <div class="container">
@@ -59,6 +61,7 @@ $nav_attr = static fn (string $section): string => $section === $nav_current ? '
         <a href="my_posts.php"<?= $nav_attr('posts') ?>>My Posts</a>
         <a href="my_claims.php"<?= $nav_attr('claims') ?>>My Claims</a>
         <a href="notifications.php"<?= $nav_attr('notifications') ?>>Notifications<?php if ($unread_count > 0): ?><span class="nav-count"><?= $unread_count > 99 ? '99+' : $unread_count ?></span><?php endif; ?></a>
+        <a href="change_password.php"<?= $nav_attr('password') ?>>Password</a>
       <?php endif; ?>
       <?php if ($header_is_admin): ?>
         <a href="admin.php"<?= $nav_attr('admin') ?>>Admin<?php if ($admin_action_total > 0): ?><span class="nav-count" title="Items that need your action"><?= $admin_action_total > 99 ? '99+' : $admin_action_total ?></span><?php endif; ?></a>

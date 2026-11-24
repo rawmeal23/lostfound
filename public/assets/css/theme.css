@@ -1,0 +1,99 @@
+/* ============================================================
+   THEME: colors from the university seal and a cleaner look.
+   Loaded after style.css, polish.css and nav.css, so it wins.
+     Navy blue    = background / header / footer
+     Classic blue = buttons, links, focus rings and highlights
+     White        = letters and cards
+     Yellow       = ONLY the "I lost something" button and the step numbers
+     Red / green  = Lost / Found labels and the Delete button (unchanged)
+   EDIT HERE: change the colors in the :root block below.
+   ============================================================ */
+:root{
+  --primary:#0b2a66;       /* navy blue: header, footer, page titles */
+  --primary-dark:#061a45;  /* darker navy: side menu, hover */
+  --accent:#1e5cc6;        /* classic blue: highlights, borders, counts */
+  --accent-dark:#164a9e;   /* darker classic blue: focus rings, markers */
+  --on-accent:#fff;        /* text color on top of classic blue */
+  --gold:#f2b705;          /* yellow: only the two places named above */
+  --on-gold:#2b2200;       /* text color on top of yellow */
+  --bg:#f1f5fb;
+  --ink:#10203f;
+  --muted:#55627d;
+  --line:#d3deee;
+}
+
+/* ---- Header and page titles ---- */
+.site-header{border-bottom:3px solid var(--accent);box-shadow:0 4px 18px rgba(8,22,80,.25)}
+.page-head{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-bottom:4px solid var(--accent)}
+.page-head h1{margin-bottom:.25em}
+.login-page .page-head{border-bottom:0}
+
+/* ---- Buttons and highlights ---- */
+.btn{border-radius:10px;transition:background .15s,transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(8,22,80,.2)}
+.btn.alt{background:var(--gold);color:var(--on-gold)}        /* "I lost something" stays yellow */
+.btn.alt:hover{background:#ffcb1f}
+.nav .btn-nav,.btn-logout{background:#fff;color:var(--primary)}  /* Login / Log out: white on navy */
+.nav .btn-nav:hover,.btn-logout:hover{background:#dce8fb}
+.step .num{background:var(--gold);color:var(--on-gold)}       /* step numbers stay yellow */
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent-dark);border-color:var(--primary)}
+
+/* ---- Cards and panels ---- */
+.panel{box-shadow:0 8px 24px rgba(8,22,80,.07)}
+.item-card{transition:transform .15s,box-shadow .15s}
+.item-card:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(8,22,80,.18)}
+.step,.stat{box-shadow:0 4px 14px rgba(8,22,80,.06)}
+.stat{border-left-color:var(--accent-dark)}
+.chip:hover{border-color:var(--accent-dark);color:var(--primary);background:#eef4fe}
+th{background:#e4edfb;color:var(--primary-dark)}
+.data-table tbody tr:hover,.admin-table tbody tr:hover{background:#f6faff}
+
+/* ---- Footer ---- */
+.site-footer{border-top:4px solid var(--accent)}
+
+/* ---- Messages ---- */
+.msg.is-error{background:#fde8e7;border-color:#e1aaa5;color:#8a1f17}
+
+/* ---- Rows of buttons in tables (Edit / Delete) ---- */
+.row-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row-actions form{margin:0}
+
+/* ---- Browse filters: one "When" menu replaces the two date boxes ---- */
+.filters{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));align-items:end}
+.filters .filter-search{grid-column:span 2}
+
+/* ============================================================
+   HOME PAGE: the campus photo (same as the login page) fills the
+   whole page. A dark blue layer keeps the white letters readable.
+   EDIT: change the two numbers in rgba() to make the photo
+   lighter (smaller) or darker (bigger).
+   ============================================================ */
+body.page-home{
+  background-color:var(--primary-dark);
+  background-image:linear-gradient(rgba(8,22,80,.72),rgba(8,22,80,.9)),url('../images/hero.jpg');
+  background-size:cover;
+  background-position:center top;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+}
+.page-home .hero{background:none;padding:104px 0 72px}
+.page-home .hero h1{font-size:clamp(2.2rem,5.5vw,3.6rem);text-shadow:0 3px 16px rgba(0,0,0,.5)}
+.page-home .hero p{font-size:1.15rem;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+.page-home .hero .btn.ghost{color:#fff;border-color:#fff}
+.page-home .hero .btn.ghost:hover{background:rgba(255,255,255,.16)}
+.page-home .searchbar{box-shadow:0 12px 30px rgba(0,0,0,.35);border-radius:12px}
+.page-home section{padding:40px 0}
+.page-home .section-title h2{color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+.page-home .section-title p{color:#d6e6ff}
+.page-home .section-title p a{color:#fff;font-weight:600;text-decoration:underline}
+.page-home .empty{color:#d6e6ff}
+.page-home .site-footer{margin-top:0}
+
+/* "Inspired by our university seal" strip */
+.seal-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.seal-card{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:22px;color:#fff;text-align:center;backdrop-filter:blur(2px)}
+.seal-card h3{margin:12px 0 6px}
+.seal-card p{margin:0;color:#d6e6ff;font-size:.95rem}
+.swatch{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;margin:0 auto;border:3px solid rgba(255,255,255,.7)}
+.swatch-blue{background:var(--primary)}
+.swatch-white{background:#fff}

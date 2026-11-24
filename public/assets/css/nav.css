@@ -1,7 +1,7 @@
 /* ============================================================
    NAVIGATION BAR, SIDE MENU AND NOTIFICATIONS
    Loaded after polish.css, so these rules win.
-   EDIT: the number 1200px (twice, in the two @media lines and in
+   EDIT: the number 1320px (twice, in the two @media lines and in
    assets/js/nav.js) is the screen width where the bar turns into the
    side menu. Use a very large number to always show the side menu.
    ============================================================ */
@@ -14,9 +14,9 @@
 .nav-user{margin-left:auto}                    /* username + Log out on the right */
 .nav a[href="register.php"]{margin-left:auto}  /* Register + Login on the right (logged out) */
 
-/* The page you are on: a darker button with a gold underline */
-.nav a.is-current{background:rgba(0,0,0,.32);box-shadow:inset 0 -3px 0 var(--accent)}
-.nav a.is-current:hover{background:rgba(0,0,0,.42)}
+/* The page you are on: a darker button (no underline) */
+.nav a.is-current{background:rgba(0,0,0,.34);font-weight:700}
+.nav a.is-current:hover{background:rgba(0,0,0,.44)}
 
 /* Buttons that only exist in the side menu */
 .nav-close,.nav-backdrop{display:none}
@@ -29,7 +29,7 @@
 }
 
 /* ---- Smaller screens: the menu slides in from the right ---- */
-@media(max-width:1200px){
+@media(max-width:1320px){
   .menu-toggle{display:block;position:relative}
   /* Red dot on the menu button when something is new */
   .menu-dot{
@@ -48,8 +48,8 @@
   }
   .nav.open{transform:none;visibility:visible}
   .nav a{padding:12px 14px;font-size:1.05rem}
-  /* In the side menu the current section gets a gold bar on its left instead */
-  .nav a.is-current{box-shadow:inset 4px 0 0 var(--accent)}
+  /* The side menu is already dark, so the current section is darker still */
+  .nav a.is-current{background:rgba(0,0,0,.5)}
   .nav-user,.nav a[href="register.php"]{margin-left:0}
   .nav-user{margin:14px 14px 6px}
   .nav .btn-logout,.nav a.btn-nav{width:100%;text-align:center;padding:12px 14px}

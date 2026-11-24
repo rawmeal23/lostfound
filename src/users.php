@@ -95,3 +95,42 @@ function register_user(array $data): array
 
     return ['ok' => true, 'errors' => [], 'id' => (int) db()->lastInsertId()];
 }
+
+/*
+ * Change the password of a logged-in member.
+ * Returns ['ok' => bool, 'errors' => [field => message]] where the fields are
+ * current_password, new_password and confirm_password.
+ */
+function user_change_password(int $user_id, string $current_password, string $new_password, string $confirm_password): array
+{
+    $errors = [];
+
+    $statement = db()->prepare('SELECT password_hash FROM users WHERE id = :id');
+    $statement->execute(['id' => $user_id]);
+    $password_hash = $statement->fetchColumn();
+
+    if (!is_string($password_hash) || !password_verify($current_password, $password_hash)) {
+        $errors['current_password'] = 'The current password is not correct.';
+    }
+
+    // bcrypt only reads the first 72 bytes, so longer passwords are refused.
+    if (strlen($new_password) < 8 || strlen($new_password) > 72) {
+        $errors['new_password'] = 'Use 8 to 72 characters.';
+    } elseif ($new_password !== $confirm_password) {
+        $errors['confirm_password'] = 'The two new passwords do not match.';
+    } elseif ($new_password === $current_password) {
+        $errors['new_password'] = 'Choose a password that is different from the current one.';
+    }
+
+    if ($errors !== []) {
+        return ['ok' => false, 'errors' => $errors];
+    }
+
+    $update = db()->prepare('UPDATE users SET password_hash = :password_hash WHERE id = :id');
+    $update->execute([
+        'password_hash' => password_hash($new_password, PASSWORD_DEFAULT),
+        'id' => $user_id,
+    ]);
+
+    return ['ok' => true, 'errors' => []];
+}

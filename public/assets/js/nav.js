@@ -22,6 +22,6 @@
   });
   // If the window becomes wide again, the normal bar returns, so reset.
   window.addEventListener('resize', function () {
-    if (window.innerWidth > 1200) { setOpen(false); }
+    if (window.innerWidth > 1320) { setOpen(false); }
   });
 })();

@@ -86,7 +86,9 @@ CREATE TABLE item_logs (
     'item_returned',
     'outcome_found',
     'outcome_never_found',
-    'item_archived'
+    'item_archived',
+    'report_edited',
+    'report_withdrawn'
   ) NOT NULL,
   claim_date DATETIME NULL,
   details VARCHAR(255) NULL,

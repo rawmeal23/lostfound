@@ -22,6 +22,7 @@ $steps = [
     ['Pick up', 'Get your item at the office after the admin verifies you.'],
 ];
 $page_title = 'Home | LSPU Lost and Found';
+$body_class = 'page-home'; // the campus photo becomes the page background (see theme.css)
 
 require __DIR__ . '/../templates/header.php';
 ?>
@@ -90,6 +91,15 @@ require __DIR__ . '/../templates/header.php';
           </div>
         </a>
       <?php endforeach; ?>
+    </div>
+  </div></section>
+
+  <!-- EDIT: this strip explains the colors of the seal. Delete the whole section if you do not want it. -->
+  <section class="seal-note"><div class="container">
+    <div class="section-title"><h2>Inspired by our university seal</h2><p>The navy blue and white of this site follow the meaning of the seal.</p></div>
+    <div class="seal-grid">
+      <div class="seal-card"><span class="swatch swatch-blue" aria-hidden="true"></span><h3>Dark blue</h3><p>Peace, unity, harmony, understanding, and enlightenment.</p></div>
+      <div class="seal-card"><span class="swatch swatch-white" aria-hidden="true"></span><h3>White</h3><p>Purity, dignity, and honor, shown in the white letters.</p></div>
     </div>
   </div></section>
 </main>

@@ -11,8 +11,7 @@ $query = $_GET['q'] ?? '';
 $type = $_GET['type'] ?? '';
 $category_id = $_GET['category_id'] ?? '';
 $location_id = $_GET['location_id'] ?? '';
-$date_from = $_GET['date_from'] ?? '';
-$date_to = $_GET['date_to'] ?? '';
+$when = $_GET['when'] ?? '';
 $filters = [];
 if (is_string($query)) {
     $filters['q'] = trim($query);
@@ -26,14 +25,19 @@ if (is_string($category_id) && ctype_digit($category_id) && (int) $category_id >
 if (is_string($location_id) && ctype_digit($location_id) && (int) $location_id > 0) {
     $filters['location_id'] = (int) $location_id;
 }
-foreach (['date_from' => $date_from, 'date_to' => $date_to] as $filter => $date_value) {
-    if (!is_string($date_value)) {
-        continue;
-    }
-    $parsed_date = DateTimeImmutable::createFromFormat('!Y-m-d', $date_value);
-    if ($parsed_date !== false && $parsed_date->format('Y-m-d') === $date_value) {
-        $filters[$filter] = $date_value;
-    }
+// "When" menu: ready-made choices instead of two date boxes.
+// Each choice becomes a start date for the existing date_from filter.
+$when_choices = [
+    'week' => ['Last 7 days', '-7 days'],
+    'month' => ['Last 30 days', '-30 days'],
+    'three_months' => ['Last 3 months', '-3 months'],
+    'six_months' => ['Last 6 months', '-6 months'],
+];
+if (!is_string($when) || !isset($when_choices[$when])) {
+    $when = '';
+}
+if ($when !== '') {
+    $filters['date_from'] = (new DateTimeImmutable('today'))->modify($when_choices[$when][1])->format('Y-m-d');
 }
 $raw_page = $_GET['page'] ?? '1';
 $page = is_string($raw_page) && ctype_digit($raw_page) ? max(1, (int) $raw_page) : 1;
@@ -43,8 +47,14 @@ $message = flash_get();
 $page_title = 'Browse Items';
 $page_count = max(1, (int) ceil($result['total'] / $per_page));
 $page = min($page, $page_count);
-$page_url = static function (int $number) use ($filters): string {
-    return 'browse.php?' . e(http_build_query($filters + ['page' => $number]));
+// Page links keep the "When" choice (not the calculated start date).
+$link_filters = $filters;
+unset($link_filters['date_from']);
+if ($when !== '') {
+    $link_filters['when'] = $when;
+}
+$page_url = static function (int $number) use ($link_filters): string {
+    return 'browse.php?' . e(http_build_query($link_filters + ['page' => $number]));
 };
 $format_date = static function (array $item): string {
     $date = $item['type'] === 'lost' ? $item['date_lost'] : $item['date_found'];
@@ -60,7 +70,7 @@ require __DIR__ . '/../templates/header.php';
       <p class="msg show" role="status"><?= e((string) $message['message']) ?></p>
     <?php endif; ?>
     <form class="filters" method="get" action="browse.php">
-      <input type="search" name="q" value="<?= e(is_string($query) ? $query : '') ?>" placeholder="Search keyword..." aria-label="Keyword">
+      <input class="filter-search" type="search" name="q" value="<?= e(is_string($query) ? $query : '') ?>" placeholder="Search keyword..." aria-label="Keyword">
       <select name="type" aria-label="Type">
         <option value="">All types</option>
         <option value="lost" <?= $type === 'lost' ? 'selected' : '' ?>>Lost</option>
@@ -78,8 +88,12 @@ require __DIR__ . '/../templates/header.php';
           <option value="<?= (int) $location['id'] ?>" <?= (string) $location['id'] === $location_id ? 'selected' : '' ?>><?= e((string) $location['name']) ?></option>
         <?php endforeach; ?>
       </select>
-      <input type="date" name="date_from" aria-label="Date from" value="<?= e(is_string($date_from) ? $date_from : '') ?>">
-      <input type="date" name="date_to" aria-label="Date to" value="<?= e(is_string($date_to) ? $date_to : '') ?>">
+      <select name="when" aria-label="When it was lost or found">
+        <option value="">Any time</option>
+        <?php foreach ($when_choices as $choice_key => $choice): ?>
+          <option value="<?= e($choice_key) ?>" <?= $when === $choice_key ? 'selected' : '' ?>><?= e($choice[0]) ?></option>
+        <?php endforeach; ?>
+      </select>
       <button class="btn">Search</button>
     </form>
     <p class="meta"><?= (int) $result['total'] ?> item(s) found</p>

@@ -316,7 +316,8 @@ lostfound/
 ├── sql/
 │   ├── schema.sql                 [Dev A]  real database structure
 │   ├── seed.sql                   [Dev A]  category and location choices
-│   └── upgrade_item_logs.sql      [Dev A]  additive history migration and legacy event backfill
+│   ├── upgrade_item_logs.sql      [Dev A]  additive history migration and legacy event backfill
+│   └── upgrade_edit_delete.sql    [Dev A]  adds the report_edited and report_withdrawn history events
 ├── config/
 │   ├── config.php                 [Dev A]  constants (BASE_URL, upload limits)
 │   └── db.php                     [Dev A]  PDO connection: db()
@@ -334,12 +335,12 @@ lostfound/
 │   ├── header.php  footer.php  nav.php   [Dev A]
 ├── public/
 │   ├── index.php login.php register.php logout.php      [Dev A]
-│   ├── report.php (type=lost|found) my_posts.php         [Dev A]
+│   ├── report.php (type=lost|found) my_posts.php edit_post.php change_password.php   [Dev A]
 │   ├── browse.php item.php claim.php my_claims.php       [Dev B]
 │   ├── admin/ dashboard.php items.php claims.php         [Dev B]
 │   ├── admin/ users.php lookups.php reports.php          [Dev B]
 │   ├── admin.php login.php                                [Database-backed admin dashboard and login]
-│   └── assets/ css/style.css  images/              [Dev A: base style, Dev B: own files css/b-*.css js/b-*.js]
+│   └── assets/ css/style.css theme.css  images/              [Dev A: base style, Dev B: own files css/b-*.css js/b-*.js]
 └── uploads/                       photos (no PHP execution allowed here)
 ```
 
@@ -418,7 +419,7 @@ CREATE TABLE item_logs (
   event_type ENUM(
     'report_created','item_approved','item_rejected','claim_submitted',
     'claim_approved','claim_rejected','item_returned','outcome_found',
-    'outcome_never_found','item_archived'
+    'outcome_never_found','item_archived','report_edited','report_withdrawn'
   ) NOT NULL,
   claim_date DATETIME NULL,
   details VARCHAR(255) NULL,
@@ -456,13 +457,16 @@ Conventions: functions never echo and never redirect. They return plain arrays. 
 | auth.php | `login_user(string $id_or_email, string $password): bool` | true on success |
 | auth.php | `logout_user(): void` | destroys session |
 | users.php | `register_user(array $data): array` | `['ok'=>bool,'errors'=>[],'id'=>int]` |
+| users.php | `user_change_password(int $user_id, string $current_password, string $new_password, string $confirm_password): array` | `['ok'=>bool,'errors'=>[field=>message]]`, new password 8 to 72 characters |
 | lookups.php | `categories_all(): array` / `locations_all(): array` | rows `[id,name]` |
 | items_member.php | `item_form_options(): array` | category and location rows for report forms |
 | uploads.php | `upload_photo(array $file): array` | `['ok'=>bool,'path'=>string,'errors'=>[]]` |
 | items_member.php | `item_create(int $user_id, array $data): array` | `['ok','errors','id']`, status always `pending` |
 | items_member.php | `items_by_user(int $user_id): array` | all items of that user, newest first |
-| items_member.php | `item_update_own(int $item_id, int $user_id, array $data): array` | only while status is pending |
-| items_member.php | `item_delete_own(int $item_id, int $user_id): bool` | only while status is pending |
+| items_member.php | `item_get_own(int $item_id, int $user_id): ?array` | one report of that user for the edit form, or null |
+| items_member.php | `item_update_own(int $item_id, int $user_id, array $data): array` | `['ok','errors']`; owner only, only while status is pending; writes `report_edited` to the history |
+| items_member.php | `item_delete_own(int $item_id, int $user_id): bool` | owner only, only while pending; the report is archived (not removed) and `report_withdrawn` is written to the history; it no longer shows in `items_by_user()` |
+| items_member.php | `item_mark_found_by_owner(int $item_id, int $user_id): bool` | owner of a LOST report says "I already found this item"; works while the report is pending or approved; the report is archived (not removed), `report_withdrawn` is written to the history, and it no longer shows in `items_by_user()` or on the site |
 | items_public.php | `items_search(array $filters, int $page = 1, int $per_page = 12): array` | `['rows'=>[],'total'=>int]`, approved only |
 | items_public.php | `item_get(int $id): ?array` | one item with category and location names |
 | items_public.php | `items_recent(string $type, int $limit = 4): array` | latest approved items of that type |
@@ -478,7 +482,7 @@ Conventions: functions never echo and never redirect. They return plain arrays. 
 | items_admin.php | `dashboard_counts(): array` | counts per status and type |
 | items_admin.php | `admin_action_count(): int` | number of items that need admin action (pending reports, pending claims, claimed items waiting to be returned, lost reports ready for the three-month outcome); each item counted once, same rule as the note on admin.php |
 
-`items_search` filters (all optional): `q`, `type`, `category_id`, `location_id`, `date_from`, `date_to`.
+`items_search` filters (all optional): `q`, `type`, `category_id`, `location_id`, `date_from`, `date_to`. The Browse page does not show date boxes; it has one "When" menu (Any time, Last 7 days, Last 30 days, Last 3 months, Last 6 months) that browse.php turns into `date_from`.
 
 ## 14. Page map
 
@@ -486,15 +490,21 @@ Conventions: functions never echo and never redirect. They return plain arrays. 
 |---|---|---|
 | index.php | everyone | Dev A |
 | login.php, register.php, logout.php | everyone | Dev A |
-| browse.php, item.php | everyone (guests see no contact details) | Dev B |
+| browse.php, item.php | everyone (guests see no contact details); on item.php the owner of a lost report gets an "I already found this item" button instead of the Post a found item link | Dev B |
 | report.php?type=lost / found | member; stores report as pending | Dev A |
-| my_posts.php | member | Dev A |
+| my_posts.php | member; Edit and Delete buttons on pending reports, "I already found this item" on approved lost reports | Dev A |
+| edit_post.php | member, own pending reports only | Dev A |
+| change_password.php | member | Dev A |
 | claim.php, my_claims.php | member | Dev B |
 | admin.php, admin/* | admin only; reviews database reports and records the event history | Dev B |
 
 The home page's Recently posted section and public browse results show approved database records. Reports and claims are inserted into SQL, and every report/claim review, return, and outcome is written to `item_logs`. Lost reports remain active until an admin records `found` or `never_found` after three months from `date_lost`; recording an outcome archives the item without deleting its record.
 
 For an existing database, import `upgrade_item_logs.sql` before using the updated pages; it safely adds the history table and backfills existing report, claim, and returned-item events. Import `seed.sql` to populate report categories, locations, demo accounts, and five approved initial items. The demo item reports are owned by the demo admin account so the demo student can submit claims for testing.
+
+To use edit and delete on an existing database, import `sql/upgrade_edit_delete.sql` once (it adds the `report_edited` and `report_withdrawn` history events). Deleting a report archives it so the history stays complete.
+
+Theme: colors and the home-page background photo live in `public/assets/css/theme.css` (navy blue, classic blue, and white; yellow only on the "I lost something" button and the step numbers).
 
 ## 15. Build order and who depends on whom
 

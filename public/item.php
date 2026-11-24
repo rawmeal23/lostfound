@@ -5,6 +5,7 @@ require_once __DIR__ . '/../src/helpers.php';
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../src/items_public.php';
 require_once __DIR__ . '/../src/claims.php';
+require_once __DIR__ . '/../src/items_member.php';
 
 // CHANGE: Load database item details and submit member claims to SQL.
 $raw_id = $_GET['id'] ?? '';
@@ -20,6 +21,23 @@ $message = flash_get();
 if ($item !== null && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_login();
     csrf_check();
+    // Owner of a lost report: "I already found this item" closes the report.
+    if (($_POST['action'] ?? '') === 'found_by_owner') {
+        $closed = false;
+        try {
+            $closed = item_mark_found_by_owner((int) $item['id'], (int) $user['id']);
+        } catch (PDOException $exception) {
+            // Most likely sql/upgrade_edit_delete.sql has not been imported yet.
+            flash_set('error', 'The report could not be closed. Ask the developer to import sql/upgrade_edit_delete.sql.');
+            redirect('item.php?id=' . (int) $item['id']);
+        }
+        if ($closed) {
+            flash_set('success', 'Glad you found it! Your lost report was removed.');
+            redirect('my_posts.php');
+        }
+        flash_set('error', 'That report could not be closed.');
+        redirect('item.php?id=' . (int) $item['id']);
+    }
     $proof = $_POST['proof'] ?? '';
     if (!is_string($proof)) {
         $errors[] = 'Enter claim details.';
@@ -69,16 +87,24 @@ require __DIR__ . '/../templates/header.php';
             <p><?= nl2br(e((string) $item['description'])) ?></p>
           <?php endif; ?>
           <div class="panel">
-            <h2><?= $item['type'] === 'found' ? 'Is this yours?' : 'Did you find this?' ?></h2>
+            <?php $is_owner = $user !== null && (int) $user['id'] === (int) $item['user_id']; ?>
+            <h2><?= $item['type'] === 'found' ? 'Is this yours?' : ($is_owner ? 'Your lost item' : 'Did you find this?') ?></h2>
             <?php if (($message['message'] ?? '') !== ''): ?>
-              <p class="msg show" role="status"><?= e((string) $message['message']) ?></p>
+              <p class="msg show<?= ($message['type'] ?? '') === 'error' ? ' is-error' : '' ?>" role="status"><?= e((string) $message['message']) ?></p>
             <?php endif; ?>
             <?php if ($errors !== []): ?>
               <div class="msg show" role="alert" style="background:#fde8e7;border-color:#e1aaa5;color:#8a1f17">
                 <?php foreach ($errors as $error): ?><p><?= e((string) $error) ?></p><?php endforeach; ?>
               </div>
             <?php endif; ?>
-            <?php if ($item['type'] === 'lost'): ?>
+            <?php if ($item['type'] === 'lost' && $is_owner): ?>
+              <p>Did you already find this item yourself? Press the button and the report is removed. You do not need to post anything else.</p>
+              <form method="post" action="item.php?id=<?= (int) $item['id'] ?>" onsubmit="return confirm('You found this item? The report will be removed.');">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="found_by_owner">
+                <button class="btn">I already found this item</button>
+              </form>
+            <?php elseif ($item['type'] === 'lost'): ?>
               <p>This item was reported lost. If you found it, post it as a found item or bring it to the Lost and Found office.</p>
               <p><a class="btn" href="report.php?type=found">Post a found item</a></p>
             <?php elseif ($user === null): ?>
